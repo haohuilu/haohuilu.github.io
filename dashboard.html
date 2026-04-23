@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research Dashboard — Dr. Haohui Lu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:   #1a2744;
+      --accent: #2563eb;
+      --a2:     #7c3aed;
+      --a3:     #059669;
+      --a4:     #d97706;
+      --a5:     #dc2626;
+      --a6:     #0891b2;
+      --text:   #1e293b;
+      --muted:  #64748b;
+      --border: #e2e8f0;
+      --bg:     #f1f5f9;
+      --card:   #ffffff;
+      --max-w:  1200px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+    /* NAV */
+    nav { background: var(--navy); border-bottom: 3px solid var(--accent); padding: 0 24px; }
+    .nav-inner { max-width: var(--max-w); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+    .nav-brand { color: #fff; font-weight: 600; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .nav-right { display: flex; gap: 20px; align-items: center; }
+    .nav-link { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .2s; }
+    .nav-link:hover { color: #fff; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, var(--navy) 0%, #1e3a8a 100%); color: #fff; padding: 52px 24px 72px; text-align: center; }
+    .hero h1 { font-size: 30px; font-weight: 700; margin-bottom: 10px; letter-spacing: -.5px; }
+    .hero .sub { color: #93c5fd; font-size: 15px; margin-bottom: 6px; }
+    .hero .tags { display: flex; gap: 8px; justify-content: center; margin: 12px 0; flex-wrap: wrap; }
+    .hero .tag { background: rgba(255,255,255,.1); color: #bfdbfe; border-radius: 20px; padding: 3px 12px; font-size: 12px; font-weight: 500; }
+    .hero .updated { font-size: 12px; color: #475569; margin-top: 10px; }
+
+    /* METRIC CARDS */
+    .metrics { max-width: var(--max-w); margin: -44px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+    .metric-card { background: var(--card); border-radius: 14px; padding: 22px 20px 18px; box-shadow: 0 4px 24px rgba(0,0,0,.1); border-top: 4px solid var(--accent); text-align: center; }
+    .metric-card:nth-child(2) { border-color: var(--a2); }
+    .metric-card:nth-child(3) { border-color: var(--a3); }
+    .metric-card:nth-child(4) { border-color: var(--a4); }
+    .metric-card:nth-child(5) { border-color: var(--a6); }
+    .metric-value { font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 6px; color: var(--accent); }
+    .metric-card:nth-child(2) .metric-value { color: var(--a2); }
+    .metric-card:nth-child(3) .metric-value { color: var(--a3); }
+    .metric-card:nth-child(4) .metric-value { color: var(--a4); }
+    .metric-card:nth-child(5) .metric-value { color: var(--a6); }
+    .metric-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; }
+    .metric-sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+    /* LAYOUT */
+    .main { max-width: var(--max-w); margin: 40px auto; padding: 0 24px; }
+    .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; padding-left: 10px; border-left: 3px solid var(--accent); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+    .grid-1 { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 28px; }
+
+    /* CARD */
+    .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,.06); border: 1px solid var(--border); }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .card-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+
+    /* CHARTS */
+    .chart-wrap { position: relative; height: 250px; }
+    .chart-wrap-md { position: relative; height: 220px; }
+    .chart-wrap-lg { position: relative; height: 300px; }
+    .chart-wrap-xl { position: relative; height: 340px; }
+
+    /* STAT ROW */
+    .stat-row { display: flex; gap: 0; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .stat-item { flex: 1; text-align: center; }
+    .stat-item + .stat-item { border-left: 1px solid var(--border); }
+    .stat-val { font-size: 20px; font-weight: 700; color: var(--accent); }
+    .stat-lbl { font-size: 11px; color: var(--muted); }
+
+    /* INSIGHT */
+    .insight { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 14px 18px; margin-top: 16px; }
+    .insight-title { font-size: 11px; font-weight: 700; color: #0369a1; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+    .insight ul { list-style: none; }
+    .insight li { font-size: 12px; color: var(--text); padding: 2px 0 2px 14px; position: relative; }
+    .insight li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+
+    /* BADGES */
+    .badges { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 14px; }
+    .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+    .b-blue   { background: #dbeafe; color: #1d4ed8; }
+    .b-purple { background: #ede9fe; color: #6d28d9; }
+    .b-green  { background: #d1fae5; color: #065f46; }
+    .b-yellow { background: #fef3c7; color: #92400e; }
+    .b-red    { background: #fee2e2; color: #991b1b; }
+    .b-teal   { background: #cffafe; color: #155e75; }
+
+    /* TABLE */
+    .table-card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.06); border: 1px solid var(--border); overflow: hidden; margin-bottom: 28px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 11px 16px; background: #f8fafc; color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid var(--border); }
+    td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+    .rank { font-size: 18px; font-weight: 700; color: var(--muted); text-align: center; width: 44px; }
+    .rank-gold   { color: #d97706; }
+    .rank-silver { color: #94a3b8; }
+    .rank-bronze { color: #b45309; }
+    .paper-title { font-weight: 500; line-height: 1.4; }
+    .paper-meta  { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .cites-big { font-size: 22px; font-weight: 700; color: var(--a2); text-align: right; }
+    .cites-lbl { font-size: 10px; color: var(--muted); text-align: right; }
+    .year-badge { display: inline-block; background: #f1f5f9; color: var(--muted); font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+
+    /* PROGRESS BAR */
+    .progress-wrap { margin-top: 6px; }
+    .progress-bar { height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+
+    /* MOMENTUM CARDS */
+    .momentum-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+    .momentum-card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 1px 6px rgba(0,0,0,.06); }
+    .momentum-num { font-size: 28px; font-weight: 700; }
+    .momentum-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .momentum-note { font-size: 11px; margin-top: 8px; padding: 6px 10px; border-radius: 6px; }
+    .note-up   { background: #d1fae5; color: #065f46; }
+    .note-down { background: #fef3c7; color: #92400e; }
+    .note-info { background: #dbeafe; color: #1e40af; }
+
+    /* FOOTER */
+    footer { max-width: var(--max-w); margin: 0 auto 32px; padding: 20px 24px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .metrics { grid-template-columns: repeat(3, 1fr); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .momentum-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .momentum-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Dr. Haohui Lu
+    </a>
+    <div class="nav-right">
+      <a href="https://haohuilu.com" class="nav-link" target="_blank">haohuilu.com</a>
+      <a href="https://scholar.google.com.au/citations?user=T0UW1swAAAAJ" class="nav-link" target="_blank">Google Scholar</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Research Analytics Dashboard</h1>
+  <p class="sub">Dr. Haohui Lu — Research Fellow, Molly Wardaguga Institute, Charles Darwin University</p>
+  <div class="tags">
+    <span class="tag">Graph Machine Learning</span>
+    <span class="tag">Large Language Models</span>
+    <span class="tag">AI in Healthcare</span>
+    <span class="tag">Fairness & Bias in AI</span>
+    <span class="tag">Disease Prediction</span>
+  </div>
+  <p class="updated">Data from Google Scholar &amp; haohuilu.com · Last updated April 2026</p>
+</div>
+
+<!-- METRIC CARDS -->
+<div class="metrics">
+  <div class="metric-card">
+    <div class="metric-value">35</div>
+    <div class="metric-label">Publications</div>
+    <div class="metric-sub">2021 – 2026</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">1,931</div>
+    <div class="metric-label">Total Citations</div>
+    <div class="metric-sub">+811 in 2025</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">17</div>
+    <div class="metric-label">h-index</div>
+    <div class="metric-sub">Google Scholar</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">22</div>
+    <div class="metric-label">i10-index</div>
+    <div class="metric-sub">≥ 10 citations</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">55.2</div>
+    <div class="metric-label">Avg Cites/Paper</div>
+    <div class="metric-sub">as of Apr 2026</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main" style="margin-top: 56px;">
+
+  <!-- SECTION: TRENDS -->
+  <p class="section-title">Publication &amp; Citation Trends</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Publications Per Year</div>
+      <div class="card-sub">Annual research output · 2026* = partial year (Jan–Apr)</div>
+      <div class="chart-wrap"><canvas id="pubsChart"></canvas></div>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-val">35</div><div class="stat-lbl">Total Papers</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--a2)">5.8</div><div class="stat-lbl">Avg / Year</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--a3)">10</div><div class="stat-lbl">Peak (2022)</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Citation Growth</div>
+      <div class="card-sub">Annual citations received · 2026* = Jan–Apr, projected ~585</div>
+      <div class="chart-wrap"><canvas id="citesChart"></canvas></div>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-val">1,931</div><div class="stat-lbl">Total Citations</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--a2)">+52%</div><div class="stat-lbl">2024→2025</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--a3)">~585</div><div class="stat-lbl">2026 Projected</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: IMPACT MOMENTUM -->
+  <p class="section-title">Impact Momentum</p>
+  <div class="momentum-grid">
+    <div class="momentum-card">
+      <div class="momentum-num" style="color:var(--accent)">48.8</div>
+      <div class="momentum-label">Citations per month (Jan–Apr 2026)</div>
+      <div class="momentum-note note-up">↑ On pace for record year</div>
+    </div>
+    <div class="momentum-card">
+      <div class="momentum-num" style="color:var(--a2)">897</div>
+      <div class="momentum-label">Citations for top paper (KNN Variants, 2022)</div>
+      <div class="momentum-note note-info">46.5% of all citations from 1 paper</div>
+    </div>
+    <div class="momentum-card">
+      <div class="momentum-num" style="color:var(--a3)">11×</div>
+      <div class="momentum-label">Growth in avg citations/paper since 2021</div>
+      <div class="momentum-note note-up">5.0 → 55.2 citations per paper</div>
+    </div>
+    <div class="momentum-card">
+      <div class="momentum-num" style="color:var(--a4)">83%</div>
+      <div class="momentum-label">Papers published in Q1 journals</div>
+      <div class="momentum-note note-up">Scientific Reports, PLOS ONE, Springer, Elsevier</div>
+    </div>
+    <div class="momentum-card">
+      <div class="momentum-num" style="color:var(--a5)">43%</div>
+      <div class="momentum-label">First-author publication rate</div>
+      <div class="momentum-note note-info">15 of 35 papers as lead author</div>
+    </div>
+    <div class="momentum-card">
+      <div class="momentum-num" style="color:var(--a6)">2</div>
+      <div class="momentum-label">Top-tier conference papers (ICLR + EMNLP)</div>
+      <div class="momentum-note note-up">A* rated in CORE ranking</div>
+    </div>
+  </div>
+
+  <!-- SECTION: RESEARCH LANDSCAPE -->
+  <p class="section-title">Research Landscape</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Research Topic Distribution</div>
+      <div class="card-sub">Classified across 6 thematic areas (n = 35)</div>
+      <div class="chart-wrap"><canvas id="topicsChart"></canvas></div>
+      <div class="badges">
+        <span class="badge b-blue">Graph ML &amp; Disease Networks</span>
+        <span class="badge b-purple">LLMs &amp; NLP</span>
+        <span class="badge b-green">Fairness &amp; AI Ethics</span>
+        <span class="badge b-yellow">COVID &amp; Public Health</span>
+        <span class="badge b-red">ML Methods &amp; Benchmarking</span>
+        <span class="badge b-teal">Project Analytics &amp; Other</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Publication Venue Type</div>
+      <div class="card-sub">Journal articles vs. conference papers</div>
+      <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
+      <div class="insight">
+        <div class="insight-title">Venue Highlights</div>
+        <ul>
+          <li>ICLR 2026 &amp; EMNLP 2024 — flagship ML/NLP conferences (A*)</li>
+          <li>Scientific Reports (Nature) — 6 papers, high-impact open access</li>
+          <li>Machine Learning (Springer) — premier ML theory journal</li>
+          <li>Artificial Intelligence in Medicine — top clinical AI journal</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: AUTHORSHIP -->
+  <p class="section-title">Authorship &amp; Role Analysis</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Authorship Role by Year</div>
+      <div class="card-sub">First-author vs. co-author breakdown per year</div>
+      <div class="chart-wrap"><canvas id="authorshipChart"></canvas></div>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-val">15</div><div class="stat-lbl">First Author</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--a2)">20</div><div class="stat-lbl">Co-author</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--a3)">43%</div><div class="stat-lbl">Lead Rate</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Average Citations Per Paper Over Time</div>
+      <div class="card-sub">Cumulative impact trajectory (total cites ÷ total papers)</div>
+      <div class="chart-wrap"><canvas id="cppChart"></canvas></div>
+      <div class="insight">
+        <div class="insight-title">Impact Trajectory</div>
+        <ul>
+          <li>2021: 5.0 avg cites/paper → 2026: 55.2 (11× growth)</li>
+          <li>Steepest rise between 2022–2023 as early papers accumulated citations</li>
+          <li>Plateauing suggests new papers need time to accumulate</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: TOP CITED -->
+  <p class="section-title">Top Cited Papers</p>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:44px; text-align:center;">#</th>
+          <th>Paper</th>
+          <th style="width:80px; text-align:center;">Year</th>
+          <th style="width:110px; text-align:right; padding-right:20px;">Citations</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank rank-gold">1</td>
+          <td>
+            <div class="paper-title">Comparative performance analysis of K-nearest neighbour (KNN) algorithm and its different variants for disease prediction</div>
+            <div class="paper-meta">S Uddin, I Haque, <strong>H Lu</strong>, M Moni, E Gide · <em>Scientific Reports</em></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:100%; background:#d97706;"></div></div></div>
+          </td>
+          <td style="text-align:center;"><span class="year-badge">2022</span></td>
+          <td style="text-align:right; padding-right:20px;"><div class="cites-big">897</div><div class="cites-lbl">citations</div></td>
+        </tr>
+        <tr>
+          <td class="rank rank-silver">2</td>
+          <td>
+            <div class="paper-title">A patient network-based machine learning model for disease prediction: The case of type 2 diabetes mellitus</div>
+            <div class="paper-meta"><strong>H Lu</strong>, S Uddin, F Hajati, MA Moni, M Khushi · <em>Applied Intelligence</em></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:19%; background:#94a3b8;"></div></div></div>
+          </td>
+          <td style="text-align:center;"><span class="year-badge">2022</span></td>
+          <td style="text-align:right; padding-right:20px;"><div class="cites-big">172</div><div class="cites-lbl">citations</div></td>
+        </tr>
+        <tr>
+          <td class="rank rank-bronze">3</td>
+          <td>
+            <div class="paper-title">A weighted patient network-based framework for predicting chronic diseases using graph neural networks</div>
+            <div class="paper-meta"><strong>H Lu</strong>, S Uddin · <em>Scientific Reports</em></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:13%; background:#b45309;"></div></div></div>
+          </td>
+          <td style="text-align:center;"><span class="year-badge">2021</span></td>
+          <td style="text-align:right; padding-right:20px;"><div class="cites-big">119</div><div class="cites-lbl">citations</div></td>
+        </tr>
+        <tr>
+          <td class="rank">4</td>
+          <td>
+            <div class="paper-title">Machine learning in project analytics: a data-driven framework and case study</div>
+            <div class="paper-meta">S Uddin, S Ong, <strong>H Lu</strong> · <em>Scientific Reports</em></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:11.6%;"></div></div></div>
+          </td>
+          <td style="text-align:center;"><span class="year-badge">2022</span></td>
+          <td style="text-align:right; padding-right:20px;"><div class="cites-big">104</div><div class="cites-lbl">citations</div></td>
+        </tr>
+        <tr>
+          <td class="rank">5</td>
+          <td>
+            <div class="paper-title">Confirming the statistically significant superiority of tree-based machine learning algorithms over their counterparts for tabular data</div>
+            <div class="paper-meta">S Uddin, <strong>H Lu</strong> · <em>PLOS ONE</em></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:11.4%; background:var(--a6);"></div></div></div>
+          </td>
+          <td style="text-align:center;"><span class="year-badge">2024</span></td>
+          <td style="text-align:right; padding-right:20px;"><div class="cites-big">102</div><div class="cites-lbl">citations</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION: COLLABORATION -->
+  <p class="section-title">Collaboration Network</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Top Co-authors by Joint Publications</div>
+      <div class="card-sub">Number of co-authored papers</div>
+      <div class="chart-wrap"><canvas id="collabChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Most Cited Papers (Visual)</div>
+      <div class="card-sub">Top 5 papers by citation count</div>
+      <div class="chart-wrap"><canvas id="topCitedChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SECTION: RESEARCH EVOLUTION -->
+  <p class="section-title">Research Evolution Over Time</p>
+  <div class="grid-1">
+    <div class="card">
+      <div class="card-title">Topic Distribution by Year</div>
+      <div class="card-sub">How research focus has shifted across 2021–2026 — Graph ML remained core while LLMs and Fairness emerged from 2024 onward</div>
+      <div class="chart-wrap-xl"><canvas id="evolutionChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SECTION: VENUE ANALYSIS -->
+  <p class="section-title">Venue Analysis</p>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Venue</th>
+          <th style="width:110px; text-align:center;">Type</th>
+          <th style="width:80px; text-align:center;">Papers</th>
+          <th style="width:160px;">Publisher / Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Scientific Reports</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">6</td><td style="color:var(--muted); font-size:12px;">Nature Portfolio · Q1</td></tr>
+        <tr><td><strong>PLOS ONE</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">2</td><td style="color:var(--muted); font-size:12px;">PLOS · Q1 Open Access</td></tr>
+        <tr><td><strong>Applied Intelligence</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">2</td><td style="color:var(--muted); font-size:12px;">Springer · Q1</td></tr>
+        <tr><td><strong>Production Planning &amp; Control</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">2</td><td style="color:var(--muted); font-size:12px;">Taylor &amp; Francis · Q1</td></tr>
+        <tr><td><strong>Int'l J. Environmental Research &amp; Public Health</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">2</td><td style="color:var(--muted); font-size:12px;">MDPI · Q2</td></tr>
+        <tr><td><strong>Machine Learning</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">Springer · Q1 Premier ML journal</td></tr>
+        <tr><td><strong>Artificial Intelligence in Medicine</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">Elsevier · Q1</td></tr>
+        <tr><td><strong>Expert Systems with Applications</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">Elsevier · Q1</td></tr>
+        <tr><td><strong>Neurocomputing</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">Elsevier · Q1</td></tr>
+        <tr><td><strong>Transportation Research Part C</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">Elsevier · Q1</td></tr>
+        <tr><td><strong>AI and Ethics</strong></td><td style="text-align:center;"><span class="badge b-blue">Journal</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">Springer</td></tr>
+        <tr><td><strong>EMNLP 2024</strong></td><td style="text-align:center;"><span class="badge b-purple">Conference</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">ACL · A* CORE ranking</td></tr>
+        <tr><td><strong>ICLR 2026</strong></td><td style="text-align:center;"><span class="badge b-purple">Conference</span></td><td style="text-align:center; font-weight:700; font-size:16px;">1</td><td style="color:var(--muted); font-size:12px;">OpenReview · A* CORE ranking</td></tr>
+        <tr><td><strong>Australasian Joint Conference on AI</strong></td><td style="text-align:center;"><span class="badge b-purple">Conference</span></td><td style="text-align:center; font-weight:700; font-size:16px;">2</td><td style="color:var(--muted); font-size:12px;">Springer · B CORE ranking</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /main -->
+
+<footer>
+  <p>Data sourced from <a href="https://scholar.google.com.au/citations?user=T0UW1swAAAAJ" target="_blank">Google Scholar</a> and <a href="https://haohuilu.com" target="_blank">haohuilu.com</a> · Updated April 2026 · Citation counts may vary from real-time Scholar data</p>
+  <p style="margin-top:6px;">Dr. Haohui Lu — Research Fellow, Molly Wardaguga Institute, Charles Darwin University, Australia</p>
+</footer>
+
+<script>
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = '#64748b';
+  Chart.defaults.plugins.legend.labels.boxWidth = 12;
+  Chart.defaults.plugins.legend.labels.padding = 14;
+
+  const YEARS = ['2021','2022','2023','2024','2025','2026*'];
+  const C = {
+    blue:   '#2563eb',
+    purple: '#7c3aed',
+    green:  '#059669',
+    yellow: '#d97706',
+    red:    '#dc2626',
+    teal:   '#0891b2',
+  };
+
+  // 1. Publications per year
+  new Chart(document.getElementById('pubsChart'), {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [{
+        label: 'Publications',
+        data: [1, 10, 6, 9, 6, 3],
+        backgroundColor: ['#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#93c5fd'],
+        borderRadius: 7,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} papers${ctx.dataIndex===5?' (partial year)':''}` } }
+      },
+      scales: {
+        y: { beginAtZero: true, max: 13, ticks: { stepSize: 2 }, grid: { color: '#f1f5f9' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 2. Citations per year
+  new Chart(document.getElementById('citesChart'), {
+    type: 'line',
+    data: {
+      labels: YEARS,
+      datasets: [{
+        label: 'Citations',
+        data: [5, 73, 298, 534, 811, 195],
+        borderColor: C.purple,
+        backgroundColor: 'rgba(124,58,237,0.08)',
+        borderWidth: 2.5,
+        pointBackgroundColor: C.purple,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} citations${ctx.dataIndex===5?' (Jan–Apr only)':''}` } }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: v => v>=1000?(v/1000)+'k':v } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 3. Research Topics Doughnut
+  new Chart(document.getElementById('topicsChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Graph ML & Disease Networks','LLMs & NLP','Fairness & AI Ethics','COVID & Public Health','ML Methods & Benchmarking','Project Analytics & Other'],
+      datasets: [{
+        data: [14, 4, 3, 3, 6, 5],
+        backgroundColor: [C.blue, C.purple, C.green, C.yellow, C.red, C.teal],
+        borderWidth: 3,
+        borderColor: '#fff',
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'right', labels: { font: { size: 11 }, padding: 10 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} papers (${Math.round(ctx.parsed/35*100)}%)` } }
+      }
+    }
+  });
+
+  // 4. Journal vs Conference Doughnut
+  new Chart(document.getElementById('typeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Journal Articles (29)','Conference Papers (6)'],
+      datasets: [{
+        data: [29, 6],
+        backgroundColor: [C.blue, C.purple],
+        borderWidth: 3,
+        borderColor: '#fff',
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed} papers (${Math.round(ctx.parsed/35*100)}%)` } }
+      }
+    }
+  });
+
+  // 5. Authorship Stacked Bar
+  new Chart(document.getElementById('authorshipChart'), {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [
+        {
+          label: 'First Author',
+          data: [1, 3, 4, 3, 3, 1],
+          backgroundColor: C.green,
+          borderRadius: 5,
+          borderSkipped: false,
+        },
+        {
+          label: 'Co-author',
+          data: [0, 7, 2, 6, 3, 2],
+          backgroundColor: '#6ee7b7',
+          borderRadius: 5,
+          borderSkipped: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
+
+  // 6. Avg Citations Per Paper
+  new Chart(document.getElementById('cppChart'), {
+    type: 'line',
+    data: {
+      labels: YEARS,
+      datasets: [{
+        label: 'Avg Cites / Paper',
+        data: [5.0, 7.1, 22.1, 35.0, 53.8, 55.2],
+        borderColor: C.teal,
+        backgroundColor: 'rgba(8,145,178,0.08)',
+        borderWidth: 2.5,
+        pointBackgroundColor: C.teal,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} avg citations/paper` } }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 7. Top Collaborators Horizontal Bar
+  new Chart(document.getElementById('collabChart'), {
+    type: 'bar',
+    data: {
+      labels: ['S. Uddin','J. Gao','A. Khan','F. Hajati','U. Naseem','M. Khushi','MA. Moni'],
+      datasets: [{
+        label: 'Joint Papers',
+        data: [20, 5, 3, 3, 2, 2, 2],
+        backgroundColor: [C.blue, C.purple, C.green, C.yellow, C.red, C.teal, '#8b5cf6'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} joint papers` } }
+      },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 8. Top Cited Papers Horizontal Bar
+  new Chart(document.getElementById('topCitedChart'), {
+    type: 'bar',
+    data: {
+      labels: ['KNN Variants (2022)','Patient Network (2022)','Weighted Patient GNN (2021)','ML Project Analytics (2022)','Tree-based ML (2024)'],
+      datasets: [{
+        label: 'Citations',
+        data: [897, 172, 119, 104, 102],
+        backgroundColor: [C.yellow, C.blue, C.purple, C.green, C.teal],
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} citations` } }
+      },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+
+  // 9. Research Evolution Stacked Bar
+  new Chart(document.getElementById('evolutionChart'), {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [
+        { label: 'Graph ML & Disease Networks',  data: [1,3,4,2,2,1], backgroundColor: C.blue },
+        { label: 'LLMs & NLP',                   data: [0,0,0,1,2,1], backgroundColor: C.purple },
+        { label: 'Fairness & AI Ethics',         data: [0,0,0,1,1,1], backgroundColor: C.green },
+        { label: 'COVID & Public Health',        data: [0,2,0,1,0,0], backgroundColor: C.yellow },
+        { label: 'ML Methods & Benchmarking',    data: [0,4,0,2,0,0], backgroundColor: C.red },
+        { label: 'Project Analytics & Other',    data: [0,1,2,2,1,0], backgroundColor: C.teal },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { font: { size: 11 }, padding: 10 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} papers` } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, max: 11, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
