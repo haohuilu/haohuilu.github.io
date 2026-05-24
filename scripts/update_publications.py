@@ -2,6 +2,8 @@
 """
 Fetch publications from Google Scholar and update index.html.
 
+Uses a single author-profile fill (no per-publication round-trips).
+
 Usage:
     pip install scholarly
     python3 scripts/update_publications.py
@@ -9,13 +11,11 @@ Usage:
 
 import re
 import sys
-import time
 from collections import defaultdict
 from datetime import datetime
 
-SCHOLAR_ID = "T0UW1swAAAAJ"
-INDEX_HTML = "index.html"
-# Any of these strings in the author field gets bolded
+SCHOLAR_ID   = "T0UW1swAAAAJ"
+INDEX_HTML   = "index.html"
 AUTHOR_NAMES = ["H Lu", "Haohui Lu", "Lu, H", "Lu, Haohui"]
 
 PUB_START = "<!-- AUTO-PUBS-START -->"
@@ -31,35 +31,24 @@ def fetch_publications():
 
     print(f"Fetching author profile {SCHOLAR_ID}...")
     author = scholarly.search_author_id(SCHOLAR_ID)
-    scholarly.fill(author, sections=["publications"])
+    scholarly.fill(author, sections=["basics", "indices", "counts", "publications"])
+    print(f"Fetched {len(author['publications'])} publications.")
 
     pubs = []
-    total = len(author["publications"])
-    for i, pub in enumerate(author["publications"], 1):
-        print(f"  Filling publication {i}/{total}...", end="\r")
-        try:
-            scholarly.fill(pub)
-            time.sleep(0.5)  # be polite
-        except Exception as e:
-            print(f"\n  Warning: could not fill pub #{i}: {e}")
-        bib = pub.get("bib", {})
-        venue = bib.get("journal") or bib.get("conference") or bib.get("booktitle") or ""
+    for pub in author["publications"]:
+        bib  = pub.get("bib", {})
         pubs.append({
             "title":  bib.get("title", ""),
             "author": bib.get("author", ""),
-            "venue":  venue,
-            "volume": bib.get("volume", ""),
-            "number": bib.get("number", ""),
-            "pages":  bib.get("pages", ""),
+            "venue":  (bib.get("journal") or bib.get("conference")
+                       or bib.get("booktitle") or ""),
             "year":   str(bib.get("pub_year", "")),
             "url":    pub.get("pub_url", ""),
         })
-    print(f"\nFetched {len(pubs)} publications.")
     return pubs
 
 
 def bold_self(author_str):
-    """Wrap the site author's name in <b> tags wherever it appears."""
     for name in AUTHOR_NAMES:
         author_str = re.sub(
             r'(?<![A-Za-z])' + re.escape(name) + r'(?![A-Za-z])',
@@ -78,12 +67,6 @@ def format_pub_item(pub):
     parts = [authors, f'"{title}"']
     if venue:
         parts.append(f"<em>{venue}</em>")
-    if pub["volume"]:
-        parts.append(pub["volume"])
-    if pub["number"]:
-        parts.append(f'({pub["number"]})')
-    if pub["pages"]:
-        parts.append(pub["pages"])
     if year:
         parts.append(year)
 
@@ -119,7 +102,6 @@ def update_html(pubs):
     with open(INDEX_HTML, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Replace publications block
     new_block = PUB_START + "\n" + build_pubs_html(pubs) + "\n    " + PUB_END
     pattern = re.escape(PUB_START) + r".*?" + re.escape(PUB_END)
     if not re.search(pattern, content, flags=re.DOTALL):
@@ -127,7 +109,6 @@ def update_html(pubs):
         sys.exit(1)
     content = re.sub(pattern, new_block, content, flags=re.DOTALL)
 
-    # Update footer date
     month_year = datetime.now().strftime("%B %Y")
     content = re.sub(r"Updated: \w+ \d{4}", f"Updated: {month_year}", content)
 
