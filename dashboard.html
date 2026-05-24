@@ -174,35 +174,35 @@
     <span class="tag">Fairness & Bias in AI</span>
     <span class="tag">Disease Prediction</span>
   </div>
-  <p class="updated">Data from Google Scholar &amp; haohuilu.com · Last updated April 2026</p>
+  <p class="updated">Data from Google Scholar &amp; haohuilu.com · Last updated <span id="dash-updated">April 2026</span></p>
 </div>
 
 <!-- METRIC CARDS -->
 <div class="metrics">
   <div class="metric-card">
-    <div class="metric-value">35</div>
+    <div class="metric-value" id="m-pubs">35</div>
     <div class="metric-label">Publications</div>
-    <div class="metric-sub">2021 – 2026</div>
+    <div class="metric-sub" id="m-pubs-range">2021 – 2026</div>
   </div>
   <div class="metric-card">
-    <div class="metric-value">1,931</div>
+    <div class="metric-value" id="m-cites">1,931</div>
     <div class="metric-label">Total Citations</div>
-    <div class="metric-sub">+811 in 2025</div>
+    <div class="metric-sub" id="m-cites-prev">+811 in 2025</div>
   </div>
   <div class="metric-card">
-    <div class="metric-value">17</div>
+    <div class="metric-value" id="m-hindex">17</div>
     <div class="metric-label">h-index</div>
     <div class="metric-sub">Google Scholar</div>
   </div>
   <div class="metric-card">
-    <div class="metric-value">22</div>
+    <div class="metric-value" id="m-i10">22</div>
     <div class="metric-label">i10-index</div>
     <div class="metric-sub">≥ 10 citations</div>
   </div>
   <div class="metric-card">
-    <div class="metric-value">55.2</div>
+    <div class="metric-value" id="m-avg">55.2</div>
     <div class="metric-label">Avg Cites/Paper</div>
-    <div class="metric-sub">as of Apr 2026</div>
+    <div class="metric-sub" id="m-avg-date">as of Apr 2026</div>
   </div>
 </div>
 
@@ -344,6 +344,7 @@
           <th style="width:110px; text-align:right; padding-right:20px;">Citations</th>
         </tr>
       </thead>
+      <!-- AUTO-TOP-CITED-START -->
       <tbody>
         <tr>
           <td class="rank rank-gold">1</td>
@@ -396,6 +397,7 @@
           <td style="text-align:right; padding-right:20px;"><div class="cites-big">102</div><div class="cites-lbl">citations</div></td>
         </tr>
       </tbody>
+      <!-- AUTO-TOP-CITED-END -->
     </table>
   </div>
 
@@ -459,7 +461,7 @@
 </div><!-- /main -->
 
 <footer>
-  <p>Data sourced from <a href="https://scholar.google.com.au/citations?user=T0UW1swAAAAJ" target="_blank">Google Scholar</a> and <a href="https://haohuilu.com" target="_blank">haohuilu.com</a> · Updated April 2026 · Citation counts may vary from real-time Scholar data</p>
+  <p>Data sourced from <a href="https://scholar.google.com.au/citations?user=T0UW1swAAAAJ" target="_blank">Google Scholar</a> and <a href="https://haohuilu.com" target="_blank">haohuilu.com</a> · Updated <span id="dash-footer-updated">April 2026</span> · Citation counts may vary from real-time Scholar data</p>
   <p style="margin-top:6px;">Dr. Haohui Lu — Research Fellow, Molly Wardaguga Institute, Charles Darwin University, Australia</p>
 </footer>
 
@@ -470,7 +472,7 @@
   Chart.defaults.plugins.legend.labels.boxWidth = 12;
   Chart.defaults.plugins.legend.labels.padding = 14;
 
-  const YEARS = ['2021','2022','2023','2024','2025','2026*'];
+  const YEARS = ['2021','2022','2023','2024','2025','2026*']; // @@AUTO:years@@
   const C = {
     blue:   '#2563eb',
     purple: '#7c3aed',
@@ -487,8 +489,8 @@
       labels: YEARS,
       datasets: [{
         label: 'Publications',
-        data: [1, 10, 6, 9, 6, 3],
-        backgroundColor: ['#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#93c5fd'],
+        data: [1, 10, 6, 9, 6, 3], // @@AUTO:pubs-per-year@@
+        backgroundColor: ['#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#93c5fd'], // @@AUTO:pubs-colors@@
         borderRadius: 7,
         borderSkipped: false,
       }]
@@ -514,7 +516,7 @@
       labels: YEARS,
       datasets: [{
         label: 'Citations',
-        data: [5, 73, 298, 534, 811, 195],
+        data: [5, 73, 298, 534, 811, 195], // @@AUTO:cites-per-year@@
         borderColor: C.purple,
         backgroundColor: 'rgba(124,58,237,0.08)',
         borderWidth: 2.5,
@@ -627,7 +629,7 @@
       labels: YEARS,
       datasets: [{
         label: 'Avg Cites / Paper',
-        data: [5.0, 7.1, 22.1, 35.0, 53.8, 55.2],
+        data: [5.0, 7.1, 22.1, 35.0, 53.8, 55.2], // @@AUTO:cpp-by-year@@
         borderColor: C.teal,
         backgroundColor: 'rgba(8,145,178,0.08)',
         borderWidth: 2.5,
