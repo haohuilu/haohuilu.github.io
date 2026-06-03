@@ -141,20 +141,29 @@ def fetch_data():
     author = scholarly.search_author_id(SCHOLAR_ID)
     scholarly.fill(author, sections=["basics", "indices", "counts", "publications"])
     total = len(author["publications"])
-    print(f"Fetched {total} publications.")
+    print(f"Fetched {total} publications. Filling per-publication details...")
 
     pubs = []
-    for pub in author["publications"]:
+    for i, pub in enumerate(author["publications"], 1):
+        # Per-pub fill is required to populate author lists + venue, which the
+        # author-profile fill leaves empty. Needed for first-author rate, venue
+        # split, collaboration chart, and top-tier detection.
+        try:
+            scholarly.fill(pub, sections=["bib"])
+        except Exception as e:  # noqa: BLE001 — keep going on transient failures
+            print(f"  WARN: could not fill pub {i}/{total}: {e}")
         bib = pub.get("bib", {})
         pubs.append({
             "title":     bib.get("title", ""),
             "author":    bib.get("author", ""),
             "venue":     (bib.get("journal") or bib.get("conference")
-                          or bib.get("booktitle") or ""),
+                          or bib.get("booktitle") or bib.get("venue") or ""),
             "year":      str(bib.get("pub_year", "")),
             "citations": pub.get("num_citations", 0),
             "url":       pub.get("pub_url", ""),
         })
+        if i % 10 == 0 or i == total:
+            print(f"  filled {i}/{total}")
 
     return {
         "total_citations": author.get("citedby",   0),
@@ -275,8 +284,8 @@ def momentum_html(data, years, pubs_per_year, cites_per_year, cpp,
     total_cites  = data["total_citations"]
     top_pct      = round(top_cites / total_cites * 100, 1) if total_cites else 0
 
-    # Growth multiplier: latest cpp / earliest cpp
-    first_cpp   = cpp[0] if cpp and cpp[0] > 0 else 1
+    # Growth multiplier: latest cpp / first NON-ZERO cpp (early years often 0)
+    first_cpp   = next((v for v in cpp if v > 0), 0)
     latest_cpp  = cpp[-1]
     multiplier  = round(latest_cpp / first_cpp) if first_cpp > 0 else "?"
 
@@ -320,7 +329,7 @@ def momentum_html(data, years, pubs_per_year, cites_per_year, cpp,
         {
             "num":   f"{multiplier}×",
             "label": f"Growth in avg citations/paper since {START_YEAR}",
-            "note":  f"{cpp[0]} → {latest_cpp} citations per paper",
+            "note":  f"{first_cpp} → {latest_cpp} citations per paper",
             "cls":   "note-up",
             "color": colors[2],
         },
@@ -360,9 +369,11 @@ def momentum_html(data, years, pubs_per_year, cites_per_year, cpp,
 
 
 def cpp_insight_html(cpp, years):
-    first_year = years[0]
+    # Use the first NON-ZERO cpp year as the baseline (early years are often 0).
+    first_idx  = next((i for i, v in enumerate(cpp) if v > 0), 0)
+    first_year = years[first_idx]
     last_year  = years[-1]
-    first_val  = cpp[0]
+    first_val  = cpp[first_idx]
     last_val   = cpp[-1]
     mult       = round(last_val / first_val) if first_val > 0 else "?"
 
@@ -513,6 +524,10 @@ def update_html(data, years, pubs_per_year, cites_per_year, cpp):
     # ── citations per year chart ───────────────────────────────────────────────
     content = replace_js_line(content, "cites-per-year",
         f"        data: {js_list(cites_per_year)}, // @@AUTO:cites-per-year@@")
+    content = replace_js_line(content, "cites-tooltip",
+        f"        tooltip: {{ callbacks: {{ label: ctx => `${{ctx.parsed.y}} "
+        f"citations${{ctx.dataIndex===YEARS.length-1?' (Jan–{month_abbr} only)':''}}` }} }} "
+        f"// @@AUTO:cites-tooltip@@")
 
     # ── avg cpp chart ─────────────────────────────────────────────────────────
     content = replace_js_line(content, "cpp-by-year",
