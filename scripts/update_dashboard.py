@@ -24,6 +24,7 @@ Usage:
 import re
 import sys
 import math
+import calendar
 from collections import defaultdict, Counter
 from datetime import datetime
 
@@ -273,8 +274,11 @@ def momentum_html(data, years, pubs_per_year, cites_per_year, cpp,
     prev_cites = data["cites_per_year"].get(prev, 0)
     cpm        = round(cur_cites / month, 1) if month else 0
 
-    # Is current year on pace to beat last year?
-    pace_vs_prev = (cur_cites / month * 12) if month else 0
+    # Is current year on pace to beat last year? Annualise by fraction of the
+    # YEAR elapsed (day-of-year based) so it's accurate even early in a month.
+    now          = datetime.now()
+    year_frac    = now.timetuple().tm_yday / (366 if calendar.isleap(cur) else 365)
+    pace_vs_prev = (cur_cites / year_frac) if year_frac > 0 else 0
     beating_prev = pace_vs_prev > prev_cites
 
     # Top paper
@@ -455,8 +459,13 @@ def update_html(data, years, pubs_per_year, cites_per_year, cpp):
     else:
         growth_str = "—"
 
-    # Projected full-year citations
-    projected = round(cur_cites / month * 12) if month else cur_cites
+    # Projected full-year citations — annualise by fraction of YEAR elapsed
+    # (day-of-year based), which is accurate even early in a month.
+    now          = datetime.now()
+    day_of_year  = now.timetuple().tm_yday
+    days_in_year = 366 if calendar.isleap(cur) else 365
+    year_frac    = day_of_year / days_in_year
+    projected    = round(cur_cites / year_frac) if year_frac > 0 else cur_cites
 
     # Venue split
     journals, conferences = venue_split(data)
