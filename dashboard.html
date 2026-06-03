@@ -214,68 +214,70 @@
   <div class="grid-2">
     <div class="card">
       <div class="card-title">Publications Per Year</div>
-      <div class="card-sub">Annual research output · 2026* = partial year (Jan–Apr)</div>
+      <div class="card-sub">Annual research output · <span id="s-partial-year-note">2026* = partial year (Jan–Jun)</span></div>
       <div class="chart-wrap"><canvas id="pubsChart"></canvas></div>
       <div class="stat-row">
-        <div class="stat-item"><div class="stat-val">35</div><div class="stat-lbl">Total Papers</div></div>
-        <div class="stat-item"><div class="stat-val" style="color:var(--a2)">5.8</div><div class="stat-lbl">Avg / Year</div></div>
-        <div class="stat-item"><div class="stat-val" style="color:var(--a3)">10</div><div class="stat-lbl">Peak (2022)</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-total-pubs">38</div><div class="stat-lbl">Total Papers</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-avg-per-year" style="color:var(--a2)">6.3</div><div class="stat-lbl">Avg / Year</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-peak-year" style="color:var(--a3)">11</div><div class="stat-lbl" id="s-peak-year-lbl">Peak (2022)</div></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Citation Growth</div>
-      <div class="card-sub">Annual citations received · 2026* = Jan–Apr, projected ~585</div>
+      <div class="card-sub">Annual citations received · <span id="s-cites-projected-note">2026* = Jan–Jun, projected ~588</span></div>
       <div class="chart-wrap"><canvas id="citesChart"></canvas></div>
       <div class="stat-row">
-        <div class="stat-item"><div class="stat-val">1,931</div><div class="stat-lbl">Total Citations</div></div>
-        <div class="stat-item"><div class="stat-val" style="color:var(--a2)">+52%</div><div class="stat-lbl">2024→2025</div></div>
-        <div class="stat-item"><div class="stat-val" style="color:var(--a3)">~585</div><div class="stat-lbl">2026 Projected</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-total-cites-r">2,035</div><div class="stat-lbl">Total Citations</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-growth-rate" style="color:var(--a2)">+52%</div><div class="stat-lbl" id="s-growth-rate-lbl">2024→2025</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-projected" style="color:var(--a3)">~588</div><div class="stat-lbl" id="s-projected-lbl">2026 Projected</div></div>
       </div>
     </div>
   </div>
 
   <!-- SECTION: IMPACT MOMENTUM -->
   <p class="section-title">Impact Momentum</p>
+  <!-- AUTO-MOMENTUM-START -->
   <div class="momentum-grid">
-    <div class="momentum-card">
-      <div class="momentum-num" style="color:var(--accent)">48.8</div>
-      <div class="momentum-label">Citations per month (Jan–Apr 2026)</div>
-      <div class="momentum-note note-up">↑ On pace for record year</div>
-    </div>
-    <div class="momentum-card">
-      <div class="momentum-num" style="color:var(--a2)">897</div>
-      <div class="momentum-label">Citations for top paper (KNN Variants, 2022)</div>
-      <div class="momentum-note note-info">46.5% of all citations from 1 paper</div>
-    </div>
-    <div class="momentum-card">
-      <div class="momentum-num" style="color:var(--a3)">11×</div>
-      <div class="momentum-label">Growth in avg citations/paper since 2021</div>
-      <div class="momentum-note note-up">5.0 → 55.2 citations per paper</div>
-    </div>
-    <div class="momentum-card">
-      <div class="momentum-num" style="color:var(--a4)">83%</div>
-      <div class="momentum-label">Papers published in Q1 journals</div>
-      <div class="momentum-note note-up">Scientific Reports, PLOS ONE, Springer, Elsevier</div>
-    </div>
-    <div class="momentum-card">
-      <div class="momentum-num" style="color:var(--a5)">43%</div>
-      <div class="momentum-label">First-author publication rate</div>
-      <div class="momentum-note note-info">15 of 35 papers as lead author</div>
-    </div>
-    <div class="momentum-card">
-      <div class="momentum-num" style="color:var(--a6)">2</div>
-      <div class="momentum-label">Top-tier conference papers (ICLR + EMNLP)</div>
-      <div class="momentum-note note-up">A* rated in CORE ranking</div>
-    </div>
+  <div class="momentum-card">
+    <div class="momentum-num" style="color:var(--accent)">49.0</div>
+    <div class="momentum-label">Citations per month (Jan–Jun 2026)</div>
+    <div class="momentum-note note-info">→ Tracking previous year pace</div>
   </div>
+  <div class="momentum-card">
+    <div class="momentum-num" style="color:var(--a2)">949</div>
+    <div class="momentum-label">Citations for top paper</div>
+    <div class="momentum-note note-info">46.6% of all citations from 1 paper</div>
+  </div>
+  <div class="momentum-card">
+    <div class="momentum-num" style="color:var(--a3)">53×</div>
+    <div class="momentum-label">Growth in avg citations/paper since 2021</div>
+    <div class="momentum-note note-up">0.0 → 53.0 citations per paper</div>
+  </div>
+  <div class="momentum-card">
+    <div class="momentum-num" style="color:var(--a4)">100%</div>
+    <div class="momentum-label">Papers in journals (vs. conferences)</div>
+    <div class="momentum-note note-up">38 journals · 0 conferences</div>
+  </div>
+  <div class="momentum-card">
+    <div class="momentum-num" style="color:var(--a5)">0%</div>
+    <div class="momentum-label">First-author publication rate</div>
+    <div class="momentum-note note-info">0 of 38 papers as lead author</div>
+  </div>
+  <div class="momentum-card">
+    <div class="momentum-num" style="color:var(--a6)">0</div>
+    <div class="momentum-label">Top-tier venue papers (—)</div>
+    <div class="momentum-note note-up">A* rated in CORE ranking</div>
+  </div>
+  </div>
+  <!-- AUTO-MOMENTUM-END -->
 
   <!-- SECTION: RESEARCH LANDSCAPE -->
   <p class="section-title">Research Landscape</p>
   <div class="grid-2">
     <div class="card">
       <div class="card-title">Research Topic Distribution</div>
-      <div class="card-sub">Classified across 6 thematic areas (n = 35)</div>
+      <div class="card-sub">Classified across 6 thematic areas (<span id="s-topics-n">n = 38</span>)</div>
       <div class="chart-wrap"><canvas id="topicsChart"></canvas></div>
       <div class="badges">
         <span class="badge b-blue">Graph ML &amp; Disease Networks</span>
@@ -311,9 +313,9 @@
       <div class="card-sub">First-author vs. co-author breakdown per year</div>
       <div class="chart-wrap"><canvas id="authorshipChart"></canvas></div>
       <div class="stat-row">
-        <div class="stat-item"><div class="stat-val">15</div><div class="stat-lbl">First Author</div></div>
-        <div class="stat-item"><div class="stat-val" style="color:var(--a2)">20</div><div class="stat-lbl">Co-author</div></div>
-        <div class="stat-item"><div class="stat-val" style="color:var(--a3)">43%</div><div class="stat-lbl">Lead Rate</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-first-author">—</div><div class="stat-lbl">First Author</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-coauthor" style="color:var(--a2)">38</div><div class="stat-lbl">Co-author</div></div>
+        <div class="stat-item"><div class="stat-val" id="s-lead-rate" style="color:var(--a3)">0%</div><div class="stat-lbl">Lead Rate</div></div>
       </div>
     </div>
 
@@ -323,11 +325,13 @@
       <div class="chart-wrap"><canvas id="cppChart"></canvas></div>
       <div class="insight">
         <div class="insight-title">Impact Trajectory</div>
+        <!-- AUTO-CPP-INSIGHT-START -->
         <ul>
-          <li>2021: 5.0 avg cites/paper → 2026: 55.2 (11× growth)</li>
-          <li>Steepest rise between 2022–2023 as early papers accumulated citations</li>
-          <li>Plateauing suggests new papers need time to accumulate</li>
+          <li>2021: 0.0 avg cites/paper → 2026: 53.0 (?× growth)</li>
+          <li>Steepest rise in 2025 as papers accumulated citations</li>
+          <li>New papers need 1–2 years to accumulate significant citations</li>
         </ul>
+  <!-- AUTO-CPP-INSIGHT-END -->
       </div>
     </div>
   </div>
@@ -344,7 +348,7 @@
           <th style="width:110px; text-align:right; padding-right:20px;">Citations</th>
         </tr>
       </thead>
-                  <!-- AUTO-TOP-CITED-START -->
+                        <!-- AUTO-TOP-CITED-START -->
       <tbody>
         <tr>
           <td class="rank rank-gold">1</td>
@@ -569,9 +573,9 @@
   new Chart(document.getElementById('typeChart'), {
     type: 'doughnut',
     data: {
-      labels: ['Journal Articles (29)','Conference Papers (6)'],
+      labels: ['Journal Articles (38)', 'Conference Papers (0)'], // @@AUTO:venue-type-labels@@
       datasets: [{
-        data: [29, 6],
+        data: [38, 0], // @@AUTO:venue-type-data@@
         backgroundColor: [C.blue, C.purple],
         borderWidth: 3,
         borderColor: '#fff',
@@ -597,14 +601,14 @@
       datasets: [
         {
           label: 'First Author',
-          data: [1, 3, 4, 3, 3, 1],
+          data: [0, 0, 0, 0, 0, 0], // @@AUTO:first-per-year@@
           backgroundColor: C.green,
           borderRadius: 5,
           borderSkipped: false,
         },
         {
           label: 'Co-author',
-          data: [0, 7, 2, 6, 3, 2],
+          data: [1, 11, 5, 9, 8, 4], // @@AUTO:coauthor-per-year@@
           backgroundColor: '#6ee7b7',
           borderRadius: 5,
           borderSkipped: false,
@@ -658,10 +662,10 @@
   new Chart(document.getElementById('collabChart'), {
     type: 'bar',
     data: {
-      labels: ['S. Uddin','J. Gao','A. Khan','F. Hajati','U. Naseem','M. Khushi','MA. Moni'],
+      labels: ['S. Uddin','J. Gao','A. Khan','F. Hajati','U. Naseem','M. Khushi','MA. Moni'], // @@AUTO:collab-labels@@
       datasets: [{
         label: 'Joint Papers',
-        data: [20, 5, 3, 3, 2, 2, 2],
+        data: [20, 5, 3, 3, 2, 2, 2], // @@AUTO:collab-data@@
         backgroundColor: [C.blue, C.purple, C.green, C.yellow, C.red, C.teal, '#8b5cf6'],
         borderRadius: 6,
         borderSkipped: false,
@@ -686,10 +690,10 @@
   new Chart(document.getElementById('topCitedChart'), {
     type: 'bar',
     data: {
-      labels: ['KNN Variants (2022)','Patient Network (2022)','Patient GNN (2021)','ML Project Analytics (2022)','Tree-based ML (2024)'],
+      labels: ['Comparative performance (2022)', 'A patient network-based (2022)', 'A weighted patient (2021)', 'Confirming the statistically (2024)', 'Machine learning in project (2022)'], // @@AUTO:topcited-labels@@
       datasets: [{
         label: 'Citations',
-        data: [897, 172, 119, 104, 102],
+        data: [949, 176, 122, 111, 110], // @@AUTO:topcited-data@@
         backgroundColor: [C.yellow, C.blue, C.purple, C.green, C.teal],
         borderRadius: 6,
         borderSkipped: false,
