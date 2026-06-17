@@ -32,34 +32,57 @@ def fetch_publications():
     print(f"Fetching author profile {SCHOLAR_ID}...")
     author = scholarly.search_author_id(SCHOLAR_ID)
     scholarly.fill(author, sections=["basics", "indices", "counts", "publications"])
-    print(f"Fetched {len(author['publications'])} publications.")
+    total = len(author["publications"])
+    print(f"Fetched {total} publications. Filling per-publication details...")
 
     pubs = []
-    for pub in author["publications"]:
-        bib  = pub.get("bib", {})
+    for i, pub in enumerate(author["publications"], 1):
+        # Per-pub fill is required to populate author lists + venue, which the
+        # author-profile fill leaves empty.
+        try:
+            scholarly.fill(pub, sections=["bib"])
+        except Exception as e:  # noqa: BLE001 — keep going on transient failures
+            print(f"  WARN: could not fill pub {i}/{total}: {e}")
+        bib = pub.get("bib", {})
         pubs.append({
             "title":  bib.get("title", ""),
             "author": bib.get("author", ""),
             "venue":  (bib.get("journal") or bib.get("conference")
-                       or bib.get("booktitle") or ""),
+                       or bib.get("booktitle") or bib.get("venue") or ""),
             "year":   str(bib.get("pub_year", "")),
             "url":    pub.get("pub_url", ""),
         })
+        if i % 10 == 0 or i == total:
+            print(f"  filled {i}/{total}")
     return pubs
 
 
-def bold_self(author_str):
+def abbreviate_author(name):
+    """'Syed Talal Ahmad' -> 'ST Ahmad'; 'Haohui Lu' -> 'H Lu'."""
+    parts = name.strip().split()
+    if len(parts) < 2:
+        return name.strip()
+    initials = "".join(p[0] for p in parts[:-1] if p)
+    return f"{initials} {parts[-1]}"
+
+
+def format_authors(author_str):
+    """Scholar joins authors with ' and '. Abbreviate + comma-separate, bold self."""
+    if not author_str:
+        return ""
+    names = [abbreviate_author(a) for a in author_str.split(" and ")]
+    joined = ", ".join(names)
     for name in AUTHOR_NAMES:
-        author_str = re.sub(
+        joined = re.sub(
             r'(?<![A-Za-z])' + re.escape(name) + r'(?![A-Za-z])',
             f'<b>{name}</b>',
-            author_str,
+            joined,
         )
-    return author_str
+    return joined
 
 
 def format_pub_item(pub):
-    authors = bold_self(pub["author"])
+    authors = format_authors(pub["author"])
     title   = pub["title"].replace('"', "&quot;")
     venue   = pub["venue"]
     year    = pub["year"]
