@@ -1,6 +1,6 @@
 # Academic Personal Website — Haohui Lu
 
-Personal academic website for Dr. Haohui Lu, Research Fellow at the Molly Wardaguga Institute, Charles Darwin University, Australia. Currently recruiting PhD candidates in AI for Health.
+Personal academic website for Dr. Haohui Lu, Research Fellow at Charles Darwin University, Australia. Currently recruiting PhD candidates in AI for Health.
 
 ## Tech Stack
 
@@ -27,7 +27,7 @@ Static assets (to be added):
 
 ## About Haohui
 
-- Title: Research Fellow, Molly Wardaguga Institute, Faculty of Health, CDU
+- Title: Research Fellow, CDU
 - Email: haohui.lu[at]cdu.edu.au
 - PhD: Data Science, University of Sydney (conferred March 2024)
 - Thesis: "Chronic Disease Prediction using Graph Machine Learning"
